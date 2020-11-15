@@ -1,42 +1,57 @@
  <template>
   <div id="app">
-    <h1>Vue.js Todo App</h1>
     <div>
-      <div>
-        <todo-list v-bind:todos="todos"></todo-list>
-        <add-todo v-on:add-todo="addNewTodo"></add-todo>
-      </div>
+
+      <router-view></router-view>
     </div>
   </div>
 </template>
 
 <script>
 
-import TodoList from "./components/Todos/TodoList";
-import AddTodo from "./components/Todos/AddTodo";
+
+
+import {Api} from "./components/api";
 
 export default {
   name: 'App',
-  components: {
-    TodoList,
-    AddTodo
-  },
+  components: {},
 
   data() {
     return {
-      todos: [
-        { id: 1, text: 'Wake up' },
-        { id: 2, text: 'Take a shower' },
-        { id: 3, text: 'Make a latte' },
-        { id: 4, text: 'Dress up' }
-      ],
+      todo: {
+        text: ''
+      },
+      todos: [],
     };
   },
+  
   methods: {
-    addNewTodo(newTodo) {
-      this.todos.push(newTodo);
+    async addNewTodo() {
+      await Api.Todos.createTodo(this.todo)
     },
+
+    async getTodos() {
+      const todos = await Api.Todos.getAllTodos();
+      console.log(todos);
+      const arr = [];
+      Object.entries(todos.body).forEach(([key, value]) => arr.push({...value, id: key}));
+      this.todos = arr;
+    },
+
+    async removeTodo(id) {
+      await Api.Todos.deleteTodo(id)
+    },
+
+    async editTodo(id, todo) {
+      await Api.Todos.updateTodo(id, todo)
+    }
   },
+
+  async beforeMount() {
+    await this.getTodos()
+  }
+
 };
 </script>
 

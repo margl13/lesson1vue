@@ -1,34 +1,34 @@
 <template>
     <div>
         <input
-                v-model="newTodoText"
+                type="text"
+                v-model="todo.text"
                 @keyup.enter="addNewTodo"
                 placeholder="Add todo"
         >
         <button @click="addNewTodo">Add</button>
+        <hr>
+        <router-link tag="button" to="/">back</router-link>
     </div>
 </template>
 
 <script>
+    import {Api} from "../api";
+
     export default {
         name: "AddTodo",
         data() {
             return {
-                newTodoText: '',
-                nextTodoId: 5
+                todo: {
+                    text: ''
+                },
+                todos: [],
             }
         },
         methods: {
-            addNewTodo() {
-                    const id = this.nextTodoId++;
-                    const text = this.newTodoText;
-                    this.$emit('add-todo', {
-                        id,
-                        text
-                        });
-                this.newTodoText = '';
+            async addNewTodo() {
+                await Api.Todos.createTodo(this.todo)
             }
-
         },
     };
 
